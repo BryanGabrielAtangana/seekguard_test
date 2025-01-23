@@ -1,17 +1,22 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { jobsData } from "@/data/jobs";
-import { Mission } from "@/types/mission";
 
 export async function GET(
-  request: NextRequest,
+  request: Request,
   { params }: { params: { id: string } }
 ) {
-  const id = parseInt(params.id);
-  const job = jobsData.find((job: Mission) => job.id === id);
+  try {
+    const job = jobsData.find((job) => job.id === parseInt(params.id));
 
-  if (!job) {
-    return new NextResponse(null, { status: 404 });
+    if (!job) {
+      return NextResponse.json({ error: "Mission not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(job);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
-
-  return NextResponse.json(job);
 }
